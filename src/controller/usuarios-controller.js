@@ -1,49 +1,59 @@
-const { response } = require("express")
+//const { response } = require("express")
 const Usuario = require("../Models/usuarios")
+const usuariosDao = require("../DAO/usuarios-dao")
 module.exports = (app,bd) => {
 
-    app.get("/usuarios", (req,res) => {
+    const DaoUsuarios = new usuariosDao(bd)
 
-        bd.all ("SELECT * FROM USUARIOS", (error, rows) => {
-            if(error) throw new Error("Erro ao consultar tabela");
+    app.get("/usuarios", async (req,res) => {
 
-            else res.send(rows)
-        })
-        
+        try{
+            const listaUsuarios= await DaoUsuarios.listarUsuarios()
+            res.send(listaUsuarios)
+
+        }catch(error){
+            res.send(error)
+        }
     } )
-    app.get("/usuarios/:email", (req,res) => {
-        for (let usr of bd.usuariosbd) {
-            if (req.params.email == usr.email) {
-                res.send(usr)
-            }
+
+    app.get("/usuarios/:email", async (req,res) => {
+       
+        try{
+            const encontraUsuario = await DaoUsuarios.procurarUsuario(req.params.email)
+            res.send(encontraUsuario)
+        }catch(error){
+            res.send(error)
         }
-        res.send("Usuário não encontrado")
     })
 
-    app.post("/usuarios", (req,res) => {
-        const usr = new Usuario (req.body.nome,req.body.email,req.body.senha)
-        bd.usuariosbd.push(usr)
-        res.send("Usuário adicionado")        
+    app.post("/usuarios", async (req,res) => {
+        const usr = [req.body.NOME,req.body.EMAIL,req.body.SENHA]
+        try{
+            const adicionaUsuarios = await DaoUsuarios.adicionarUsuario(usr)
+            res.send(adicionaUsuarios)
+        }catch(error){
+            res.send(error)
+        }
     })
 
-    app.delete("/usuarios/:email", (req,res) => {
-        for (i = 0; i < bd.usuariosbd.length; i++){
-            if (req.params.email == bd.usuariosbd[i].email){
-                bd.usuariosbd.splice(i,1)
-                res.send ("Usuário deletado")
-            }
+    app.delete("/usuarios/:email", async (req,res) => {
+        
+        try{
+            const deletaUsuario = await DaoUsuarios.deletarUsuario(req.params.email)
+            res.send(deletaUsuario)
+        }catch(error){
+            res.send(error)
         }
-        res.send ("Usuário não encontrado")
     })
 
-    app.put("/usuarios/:email", (req,res) => {
-        for (let usr of bd.usuariosbd) {
-            if (req.params.email == usr.email) {
-                usr.nome = req.body.nome
-                usr.senha = req.body.senha
-                res.send ("Usuário alterado")
-            }
+    app.put("/usuarios/:email", async (req,res) => {
+        try{
+            const parametros = [req.body.NOME, req.body.EMAIL, req.body.SENHA, req.params.email]
+            const atualizaUsuario = await DaoUsuarios.atualizarUsuario(parametros)
+            res.send(atualizaUsuario)
+        }catch(error){
+
+            res.send(error)
         }
-        res.send ("Usuário não alterado")
     })  
 }
