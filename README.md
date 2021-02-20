@@ -41,7 +41,7 @@ Feito com API Rest usando 4 verbos HTTP, sendo eles ```GET, POST, PUT E DELETE``
 ```
 > Será retornada a mensagem "Tarefa Exemplo adicionada" caso a operação seja bem sucedida.
 
-##Método PUT
+### Método PUT
 - Para atualizar um **usuário**, você deve usar a rota ```http://localhost:3030/usuarios/:email``` alterando o campo que deseja utilizando o seguinte formato:
 ```json
 {
